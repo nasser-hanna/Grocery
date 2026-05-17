@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreshTrack — Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: #1C1007;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle grid background */
+body::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(61,90,62,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61,90,62,0.15) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Glow orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.orb-1 { width: 400px; height: 400px; background: rgba(61,90,62,0.35); top: -100px; right: -100px; }
+.orb-2 { width: 300px; height: 300px; background: rgba(212,134,42,0.2); bottom: -80px; left: -80px; }
+
+.card {
+  position: relative;
+  background: rgba(253,250,246,0.97);
+  border-radius: 24px;
+  width: 440px;
+  max-width: 95vw;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  overflow: hidden;
+  animation: cardIn 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Top accent strip */
+.card-top {
+  background: linear-gradient(135deg, #2C1810 0%, #3D5A3E 100%);
+  padding: 36px 36px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-top::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M20 20.5V18H0v5h5v5H0v5h20v-9.5zm-2 4.5h-1v-1h1v1zm-3 0h-1v-1h1v1z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.shield {
+  width: 68px; height: 68px;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  margin: 0 auto 16px;
+  position: relative;
+}
+
+.title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  color: white;
+  letter-spacing: -0.5px;
+  margin-bottom: 5px;
+  position: relative;
+}
+
+.subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  position: relative;
+}
+
+.card-body { padding: 32px 36px 36px; }
+
+.error-box {
+  background: #FDEDEC;
+  color: #C0392B;
+  border: 1px solid #f5c6c2;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  margin-bottom: 20px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+.error-box.show { display: flex; }
+
+.form-group { margin-bottom: 18px; }
+
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8D7B6E;
+  margin-bottom: 7px;
+}
+
+.input-wrap { position: relative; }
+
+.input-wrap .input-icon {
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: #C4B5AC;
+  pointer-events: none;
+}
+
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1.5px solid #E8E0D8;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Instrument Sans', sans-serif;
+  color: #2C1810;
+  background: white;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3D5A3E;
+  box-shadow: 0 0 0 3px rgba(61,90,62,0.1);
+}
+
+.hint {
+  background: #F7F3EE;
+  border: 1px solid #E8E0D8;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+}
+
+.hint-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #8D7B6E;
+  margin-bottom: 8px;
+}
+
+.hint-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: #5A4A40;
+  padding: 4px 0;
+  border-bottom: 1px dashed #E8E0D8;
+}
+.hint-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.hint-row code {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: white;
+  padding: 1px 7px;
+  border-radius: 5px;
+  color: #3D5A3E;
+  border: 1px solid #E8E0D8;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: #2C1810;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Instrument Sans', sans-serif;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08));
+}
+
+.login-btn:hover {
+  background: #3D5A3E;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(61,90,62,0.3);
+}
+
+.login-btn:active { transform: translateY(0); }
+
+.login-btn.loading { pointer-events: none; opacity: 0.8; }
+
+.spinner-sm {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.loading .spinner-sm { display: block; }
+.loading .btn-text { display: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.back-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #8D7B6E;
+}
+
+.back-link a {
+  color: #3D5A3E;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.back-link a:hover { text-decoration: underline; }
+
+.card-footer {
+  padding: 14px 36px;
+  background: #F7F3EE;
+  border-top: 1px solid #E8E0D8;
+  text-align: center;
+}
+
+.footer-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #C4B5AC;
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="card">
+  <div class="card-top">
+    <div class="shield">🔐</div>
+    <div class="title">Admin Portal</div>
+    <div class="subtitle">FreshTrack Inventory System</div>
+  </div>
+
+  <div class="card-body">
+    <div class="error-box" id="error-box">
+      <span>⚠️</span>
+      <span id="error-msg">Invalid credentials</span>
+    </div>
+
+    <div class="form-group">
+      <label>Username or Email</label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input type="text" id="username" placeholder="admin" autocomplete="username">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔑</span>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter') doLogin()">
+      </div>
+    </div>
+
+    <div class="hint">
+      <div class="hint-title">Default Admin Accounts</div>
+      <div class="hint-row"><span>Super Admin</span><code>admin</code> / <code>admin123</code></div>
+      <div class="hint-row"><span>Manager</span><code>manager</code> / <code>manager123</code></div>
+      <div class="hint-row"><span>Inventory</span><code>inventory</code> / <code>inv123</code></div>
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      <div class="spinner-sm"></div>
+      <span class="btn-text">Sign In to Dashboard →</span>
+    </button>
+
+    <div class="back-link">
+      Not an admin? <a href="/">Go to Store →</a>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-text">🔒 Secure Admin Access · FreshTrack v2</div>
+  </div>
+</div>
+
+<script>
+async function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errBox   = document.getElementById('error-box');
+  const btn      = document.getElementById('login-btn');
+
+  errBox.classList.remove('show');
+
+  if (!username || !password) {
+    document.getElementById('error-msg').textContent = 'Please enter your username and password.';
+    errBox.classList.add('show');
+    return;
+  }
+
+  btn.classList.add('loading');
+
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Animate success then redirect
+      btn.innerHTML = '<span class="btn-text">✓ Welcome, ' + data.admin.username + '!</span>';
+      btn.style.background = '#3D5A3E';
+      setTimeout(() => { window.location.href = '/admin'; }, 600);
+    } else {
+      document.getElementById('error-msg').textContent = data.error || 'Login failed.';
+      errBox.classList.add('show');
+      btn.classList.remove('loading');
+      // Shake animation
+      const card = document.querySelector('.card');
+      card.style.animation = 'none';
+      card.style.transform = 'translateX(-8px)';
+      setTimeout(() => { card.style.transform = 'translateX(8px)'; }, 80);
+      setTimeout(() => { card.style.transform = 'translateX(-4px)'; }, 160);
+      setTimeout(() => { card.style.transform = 'translateX(0)'; card.style.transition = 'transform 0.2s'; }, 240);
+    }
+  } catch (err) {
+    document.getElementById('error-msg').textContent = 'Connection error. Is the server running?';
+    errBox.classList.add('show');
+    btn.classList.remove('loading');
+  }
+}
+
+// Auto-focus
+document.getElementById('username').focus();
+</script>
+</body>
+</html>
